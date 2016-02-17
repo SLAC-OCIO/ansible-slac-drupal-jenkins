@@ -20,10 +20,8 @@
   command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
 
 
-vars:
-- site_name:
-  - "slac-www"
-  - "slac-gtw"
-  - "slac-features"
-
-
+  vars:
+    - site_name:
+      - "slac-www"
+      - "slac-gtw"
+      - "slac-features"
