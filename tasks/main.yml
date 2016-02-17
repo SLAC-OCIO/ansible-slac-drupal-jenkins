@@ -1,4 +1,6 @@
 ---
+- include: "files/varsfile.yml"
+
 - name: copy sites settings files
   template: 
     src: "templates/drupal_settings.php.j2 "
@@ -18,10 +20,3 @@
 
 - name: build sites locally
   command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
-
-
-  vars:
-    - site_name:
-      - "slac-www"
-      - "slac-gtw"
-      - "slac-features"
