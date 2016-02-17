@@ -5,7 +5,7 @@
     dest: "/var/sites/{{ item }}/settings.php"
     owner: "{{ ansible_user_id }}"
     group: staff
-  with_items: "{{ site_name }}"
+  with_indexed_items: "{{ site_name }}"
 
 - name: create drush aliases
   template:
