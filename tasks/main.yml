@@ -7,13 +7,13 @@
     group: staff
   with_items: "{{ site_name }}"
 
-- name: drush aliaes
-  template: 
-  	src: "templates/drushrc.php.j2"
+- name: create drush aliases
+  template:
+    src: "templates/drushrc.php.j2"
     dest: "~/.drush/{{ item }}.php"
-  	mode: 0755  
-  	owner: {{ ansible_user_id }} 
-  	group: staff
+    mode: 0755  
+    owner: {{ ansible_user_id }} 
+    group: staff
   with_items:  "{{ site_name }}"
 
 - name: build sites locally
