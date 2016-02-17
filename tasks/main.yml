@@ -8,18 +8,18 @@
       template: 
         src: templates/drupal_settings.php.j2 
         dest: "/var/sites/{{ site_name }}/settings.php"
-        owner: {{ ansible_user_id }}
+        owner: "{{ ansible_user_id }}""
         group: staff
-      with_items:
-        {{ site_name }}
+      with_items: "{{ site_name }}"
 
     - name: drush aliaes
       template: 
-      	src: templates/drushrc.php.j2
-        dest: "~/.drush/{{ site_name }}.php "
-      	mode: 0755  
-      	owner: {{ ansible_user_id }}  src=templates/drushrc.php.j2 
-      with_items:  "{{ site_name }}"
+	  	src: templates/drushrc.php.j2
+	    dest: "~/.drush/{{ site_name }}.php"
+	  	mode: 0755  
+	  	owner: {{ ansible_user_id }} 
+	  	group: staff
+	  with_items:  "{{ site_name }}"
 
     - name: build sites locally
       command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
