@@ -12,7 +12,7 @@
     src: "templates/drushrc.php.j2"
     dest: "~/.drush/{{ item }}.php"
     mode: 0755  
-    owner: {{ ansible_user_id }} 
+    owner: "{{ ansible_user_id }}"
     group: staff
   with_items:  "{{ site_name }}"
 
