@@ -2,7 +2,7 @@
 - name: copy sites settings files
   template: 
     src: /usr/local/superlumic/roles/slac.sites-build/templates/drupal_settings.php.j2
-    dest: "/var/sites/{{ item }}/settings.php"
+    dest: "/var/sites/{{ item }}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
     group: staff
   with_indexed_items: "{{ site_name }}"
