@@ -1,6 +1,4 @@
 ---
-- include: "files/varsfile.yml"
-
 - name: copy sites settings files
   template: 
     src: "templates/drupal_settings.php.j2 "
