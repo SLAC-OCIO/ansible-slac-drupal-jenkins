@@ -1,7 +1,7 @@
 ---
 - name: copy sites settings files
   template: 
-    src: "templates/drupal_settings.php.j2 "
+    src: roles/slac.sites-build/templates/drupal_settings.php.j2
     dest: "/var/sites/{{ item }}/settings.php"
     owner: "{{ ansible_user_id }}"
     group: staff
@@ -9,7 +9,7 @@
 
 - name: create drush aliases
   template:
-    src: "templates/drushrc.php.j2"
+    src: roles/slac.sites-build//drushrc.php.j2
     dest: "~/.drush/{{ item }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
