@@ -12,18 +12,17 @@
         group: staff
       with_items:
         {{ site_name }}
-    
-    - name: build sites locally
-      command: /usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php
 
     - name: drush aliaes
-      sudo: yes
       template: 
-      	dest: ~/.drush/{{ site_name }}.php  
+      	src: templates/drushrc.php.j2
+        dest: "~/.drush/{{ site_name }}.php "
       	mode: 0755  
       	owner: {{ ansible_user_id }}  src=templates/drushrc.php.j2 
       with_items:  "{{ site_name }}"
 
+    - name: build sites locally
+      command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
 
 
   vars:
