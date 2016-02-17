@@ -1,7 +1,7 @@
 ---
 - name: copy sites settings files
   copy: 
-    src: "/usr/local/superlumic/roles/slac.sites-build/files/{{ item }}settings.php"
+    src: "/usr/local/superlumic/roles/slac.sites-build/files/{{ item }}.settings.php"
     dest: "/var/sites/{{ item }}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
     group: staff
