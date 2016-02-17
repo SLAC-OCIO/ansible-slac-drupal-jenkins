@@ -1,20 +1,173 @@
 ---
-- name: copy sites settings files
+#Each website needs a cooresponding virtualhost for apache to know where it is
+#We create that directory
+- name: Create vhost directory
+  become: yes
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0777
+  with_items:
+    - /etc/apache2/virtualhosts
+#Ansible 2.0 has a bug with Darwin, wherein loops and become don't work together
+#TODO: Refactor into loops when the patch is pushed    
+- name: Copy virtualhost files
+  become: yes
+  copy:
+    src: files/slac_features.conf
+    dest: /etc/apache2/virtualhosts/slac_features.conf
+    owner: root
+    group: wheel
+    mode: 0655
+
+- name: Copy virtualhost files part 2
+  become: yes
+  copy:
+    src: files/slac_gtw.conf
+    dest: /etc/apache2/virtualhosts/slac_gtw.conf
+    owner: root
+    group: wheel
+    mode: 0655
+
+- name: Copy virtualhost files part 3
+  become: yes
+  copy:
+    src: files/slac_www.conf
+    dest: /etc/apache2/virtualhosts/slac_www.conf
+    owner: root
+    group: wheel
+    mode: 0655
+
+#Make the appropriate directory for the websites
+- name: Create each sites directory
+  become: yes
+  file:
+    path: "{{website_path}}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: staff
+    mode: 0777
+
+#Pull down the code, into the directories we just created
+- name: Get slac websites from Github
+  git: 
+    repo: "{{ item.repo }}.git" 
+    dest: "/var/sites/{{ item.site_name }}"
+    update: yes
+  with_items: "{{ slac_sites }}"
+
+#In order to have local dev, we must setup hosts entries
+# again, bug with Darwin and Ansible 2.0.2, loops and become
+- name: Update /etc/hosts 1
+  become: true
+  lineinfile:
+    backup: true 
+    dest: /etc/hosts
+    create: true 
+    line: "slac-features 127.0.0.1"
+    state: present
+  
+
+- name: Update /etc/hosts 2
+  become: true
+  lineinfile:
+    backup: true 
+    dest: /etc/hosts
+    create: true 
+    line: "slac-gtw 127.0.0.1"
+    state: present
+  
+
+- name: Update /etc/hosts 3
+  become: true
+  lineinfile:
+    backup: true 
+    dest: /etc/hosts
+    create: true 
+    line: "slac-www 127.0.0.1"
+    state: present
+#Log directories are essential  
+- name: Add log dir 1
+  become: true
+  file: 
+    path: /var/log/slac-www/logs
+    state: directory
+    
+
+- name: Add log dir 2
+  become: true
+  file: 
+    path: /var/log/slac-gtw/logs
+    state: directory
+    
+
+- name: Add log dir 3
+  become: true
+  file: 
+    path: /var/log/slac-features/logs
+    state: directory
+    
+#We tell apache to load out virtualhost configs
+- name: Enable virtualhosts in Apache2
+  become: yes
+  lineinfile:
+    backup: true  
+    dest: /etc/apache2/httpd.conf  
+    group: wheel  
+    insertafter: "^Include /private/etc/apache2/other/*.conf" 
+    line: "Include /private/etc/apache2/virtualhosts/*"  
+    state: present 
+
+#This quiets the hostname error
+- name: Set Hostname
+  become: yes
+  lineinfile:
+    backup: true  
+    dest: /etc/apache2/httpd.conf
+    regexp: "^#ServerName www.example.com:80"  
+    group: wheel
+    line: "ServerName localhost"  
+    state: present 
+
+#Set an admin email for Apache2
+- name: Set Admin Email
+  become: yes
+  lineinfile:
+    backup: true  
+    dest: /etc/apache2/httpd.conf
+    regexp: "^#ServerName you@example.com"  
+    group: wheel
+    line: "ServerAdmin {{ git_user_email }}"  
+    state: present 
+
+#Each Drupal site needs a settings file.  
+- name: Copy SLAC sites settings files
   copy: 
-    src: "/usr/local/superlumic/roles/slac.sites-build/files/{{ item }}.settings.php"
+    src: "/usr/local/grail/roles/slac.sites-build/files/{{ item }}.settings.php"
     dest: "/var/sites/{{ item }}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
     group: staff
   with_items: "{{ site_name }}"
 
-- name: create drush aliases
+#drush aliases make drupal development less challenging
+- name: Create drush aliases
   template:
-    src: /usr/local/superlumic/roles/slac.sites-build/templates/drushrc.php.j2
+    src: /usr/local/grail/roles/slac.sites-build/templates/drushrc.php.j2
     dest: "~/.drush/{{ item }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
     group: staff
   with_items:  "{{ site_name }}"
 
-- name: build sites locally
+#now that it's all configured, restart it.  Ansible needs OS-X specific directives 
+- name: Retart Apache2 (Darwin)
+  become: yes
+  command: "launchctl load -w /System/Library/LaunchDaemons/{{item}}.plist"
+  with_items:
+    - org.apache.httpd
+
+#This builds a website locally, slac-features specifically
+- name: Build sites locally
   command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
