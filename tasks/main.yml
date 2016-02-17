@@ -1,16 +1,16 @@
 ---
 - name: copy sites settings files
   template: 
-    src: templates/drupal_settings.php.j2 
-    dest: "/var/sites/{{ site_name }}/settings.php"
+    src: "templates/drupal_settings.php.j2 "
+    dest: "/var/sites/{{ item }}/settings.php"
     owner: "{{ ansible_user_id }}"
     group: staff
   with_items: "{{ site_name }}"
 
 - name: drush aliaes
   template: 
-  	src: templates/drushrc.php.j2
-    dest: "~/.drush/{{ site_name }}.php"
+  	src: "templates/drushrc.php.j2"
+    dest: "~/.drush/{{ item }}.php"
   	mode: 0755  
   	owner: {{ ansible_user_id }} 
   	group: staff
@@ -24,6 +24,6 @@ vars:
 - site_name:
   - "slac-www"
   - "slac-gtw"
-	  - "slac-features"
+  - "slac-features"
 
 
