@@ -148,7 +148,6 @@
     src: "{{ item }}.settings.php"
     dest: "/var/sites/{{ item }}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
-    group: staff
   with_items: "{{ site_name }}"
 
 #drush aliases make drupal development less challenging
@@ -158,7 +157,6 @@
     dest: "~/.drush/{{ item }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
-    group: staff
   with_items:  "{{ site_name }}"
 
 #now that it's all configured, restart it.  Ansible needs OS-X specific directives 
@@ -177,7 +175,6 @@
     src: ~/.slac-mac/slac-sites.py
     dest: ~/bin
     owner: "{{ ansible_user_id }}"
-    group: staff
     mode: 0655
 
 - name: Copy the SSH-Keys Documentation to the Desktop
@@ -185,5 +182,4 @@
     src: ~/.slac-mac/ssh_keys.pdf
     dest: ~/Desktop
     owner: "{{ ansible_user_id }}"
-    group: staff
     mode: 0655
