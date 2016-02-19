@@ -154,7 +154,7 @@
 #drush aliases make drupal development less challenging
 - name: Create drush aliases
   template:
-    src: /usr/local/grail/roles/slac.sites-build/templates/drushrc.php.j2
+    src: drushrc.php.j2
     dest: "~/.drush/{{ item }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
@@ -162,7 +162,7 @@
   with_items:  "{{ site_name }}"
 
 #now that it's all configured, restart it.  Ansible needs OS-X specific directives 
-- name: Retart Apache2 (Darwin)
+- name: Restart Apache2 (Darwin)
   become: yes
   command: "launchctl load -w /System/Library/LaunchDaemons/{{item}}.plist"
   with_items:
