@@ -171,3 +171,19 @@
 #This builds a website locally, slac-features specifically
 - name: Build sites locally
   command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
+
+- name: Copy the SLAC-Sites.py to ~/bin
+  copy:
+    src: ~/.slac-mac/slac-sites.py
+    dest: ~/bin
+    owner: "{{ ansible_user_id }}"
+    group: staff
+    mode: 0655
+
+- name: Copy the SSH-Keys Documentation to the Desktop
+  copy:
+    src: ~/.slac-mac/ssh_keys.pdf
+    dest: ~/Desktop
+    owner: "{{ ansible_user_id }}"
+    group: staff
+    mode: 0655
