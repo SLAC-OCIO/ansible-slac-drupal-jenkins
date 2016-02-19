@@ -53,7 +53,7 @@
 #Pull down the code, into the directories we just created
 - name: Get slac websites from Github
   git: 
-    repo: "{{ item.repo }}." 
+    repo: "{{ item.repo }}" 
     dest: "/var/sites/{{ item.site_name }}"
     update: yes
   with_items: "{{ slac_sites }}"
