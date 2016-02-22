@@ -66,7 +66,7 @@
     backup: true 
     dest: /etc/hosts
     create: true 
-    line: "slac-features 127.0.0.1"
+    line: "127.0.0.1 slac-features "
     state: present
   
 
@@ -76,7 +76,7 @@
     backup: true 
     dest: /etc/hosts
     create: true 
-    line: "slac-gtw 127.0.0.1"
+    line: "slac-features  slac-gtw"
     state: present
   
 
@@ -86,8 +86,9 @@
     backup: true 
     dest: /etc/hosts
     create: true 
-    line: "slac-www 127.0.0.1"
+    line: "127.0.0.1 slac-www"
     state: present
+    
 #Log directories are essential  
 - name: Add log dir 1
   become: true
