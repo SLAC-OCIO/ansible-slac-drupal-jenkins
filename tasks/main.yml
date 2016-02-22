@@ -56,6 +56,7 @@
     repo: "{{ item.repo }}" 
     dest: "/var/sites/{{ item.site_name }}"
     update: yes
+    refspec: +refs/pull/*:refs/heads/*
   with_items: "{{ slac_sites }}"
 
 #In order to have local dev, we must setup hosts entries
@@ -88,7 +89,7 @@
     create: true 
     line: "127.0.0.1 slac-www"
     state: present
-    
+
 #Log directories are essential  
 - name: Add log dir 1
   become: true
