@@ -178,14 +178,14 @@
     paths: /Users/{{ slac_sites }}/.slac_mac
     file_type: file
     patterns: "*.tar.gz"
-    register: "{{ sql_files }}"
+    register: sql_files
 
 - name: Copy/Unarchive sql files to .slac_mac directory
   unarchive: 
     copy: yes  
     dest: "/Users/{{ ansible_user_id }}/.slac_mac"  
     mode: 755   
-    src: "/usr/local/grail/files/{{ item }} "
+    src: "/usr/local/grail/files/{{ item.stdout }} "
   with_items:  "{{ sql_files }}"
 
 - name: Get drupal DB condition
