@@ -175,10 +175,13 @@
 #Discover SQL dump archives
 - name: Get list of SQL archives
   find: 
-    paths: /Users/{{ slac_sites }}/.slac_mac
+    paths: /Users/{{ ansible_user_id }}/.slac_mac
     file_type: file
     patterns: "*.tar.gz"
     register: sql_files
+
+- debug: 
+    var: sql_files
 
 - name: Copy/Unarchive sql files to .slac_mac directory
   unarchive: 
