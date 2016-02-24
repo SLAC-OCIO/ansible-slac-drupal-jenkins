@@ -1,0 +1,33 @@
+---
+- name: Get list of SQL archives
+  find: 
+	paths: /Users/{{ slac_sites }}/.slac_mac
+      file_type: file
+      patterns: *.tar.gz
+      register: {{ sql_files }}
+
+- name: Copy/Unarchive sql files to .slac_mac directory
+  unarchive: 
+  	copy: yes  
+  	dest: "/Users/{{ ansible_user_id }}/.slac_mac"  
+  	mode: 755   
+  	src: /usr/local/grail/files/{{ item }}  
+  with_items:  {{ sql_files }}
+
+- name: Get drupal DB condition
+	command: drush status | grep -i "Bootstrap" | sed 's/[\:].*//'
+	chdir: /var/sites/{{ item }}  
+	with_items: {{ slac_sites }}
+	register: drupal-db-populated  
+
+- name: Run drush sql-drop all on each site listed
+	command: drush sql-drop all 
+	chdir: /var/sites/{{ item }}
+	with_items:  {{ slac_sites }}
+	when: drupal-db-populated
+
+- name: Load the database for each site
+	command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
+	chdir: /var/sites/{{ item }}
+	with_items:  {{ slac_sites }}
+
