@@ -172,6 +172,12 @@
 - name: Build sites locally
   command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
 
+# Check if the site has a DB currently
+- name: Check DB status
+  stat:  path="/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
+  with_items:  "{{ slac_sites }}"
+  register: db_yes 
+
 #Discover SQL dump archives
 - name: Get list of SQL archives
   find: 
@@ -185,31 +191,25 @@
 
 - name: Copy/Unarchive sql files to .slac_mac directory
   unarchive: 
-    copy: yes  
+    copy: no 
     dest: "/Users/{{ ansible_user_id }}/.slac_mac"  
     mode: 755   
     src: "/usr/local/grail/files/{{ item.stdout }} "
   with_items:  "{{ sql_files }}"
-
-- name: Get drupal DB condition
-  command: drush status | grep -i "Bootstrap" | sed 's/[\:].*//'
-  args:
-    chdir="/var/sites/{{ item }} "
-  with_items: "{{ slac_sites }}"
-  register: drupal-db-populated  
 
 - name: Run drush sql-drop all on each site listed
   command: drush sql-drop all 
   args:
     chdir="/var/sites/{{ item }}"
   with_items:  "{{ slac_sites }}"
-  when: drupal-db-populated
+  when:  not db_yes 
 
 - name: Load the database for each site
   command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
   args:
     chdir="/var/sites/{{ item }}"
   with_items:  "{{ slac_sites }}"
+  creates: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
