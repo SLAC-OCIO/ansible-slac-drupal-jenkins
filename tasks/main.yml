@@ -147,19 +147,19 @@
 #Each Drupal site needs a settings file.  
 - name: Copy SLAC sites settings files
   copy: 
-    src: "{{ item }}.settings.php"
-    dest: "/var/sites/{{ item }}/sites/default/settings.php"
+    src: "{{ item.site_name }}.settings.php"
+    dest: "{{ item.path}}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
-  with_items: "{{ site_name }}"
+  with_dict: "{{ slac_sites}}"
 
 #drush aliases make drupal development less challenging
 - name: Create drush aliases
   template:
     src: drushrc.php.j2
-    dest: "~/.drush/{{ item }}.php"
+    dest: "~/.drush/{{ item.site_name }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
-  with_items:  "{{ site_name }}"
+  with_items:  "{{ slac_sites }}"
 
 #now that it's all configured, restart it.  Ansible needs OS-X specific directives 
 - name: Restart Apache2 (Darwin)
@@ -175,7 +175,7 @@
 # Check if the site has a DB currently
 - name: Check DB status
   stat:  
-    path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
+    path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.site_name }}.db_yes"
   with_items:  "{{ slac_sites }}"
   register: db_yes 
 

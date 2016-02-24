@@ -4,7 +4,7 @@
    'driver' => 'mysql',
    'database' => 'slac-www',
    'username' => 'root',
-   'password' => 'y0u$houldReallyChangeMe',
+   'password' => '',
    'host' => 'localhost',
    'prefix' => '',
  );
