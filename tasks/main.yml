@@ -175,58 +175,10 @@
 # Check if the site has a DB currently
 - name: Check DB status
   stat:  
-  path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
+    path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
   with_items:  "{{ slac_sites }}"
   register: db_yes 
 
 - debug: 
     var: db_yes
 
-#Discover SQL dump archives
-- name: Get list of SQL archives
-  find: 
-    paths: "/Users/{{ ansible_user_id }}/.slac_mac"
-    file_type: file
-    patterns: "*.tar.gz"
-    register: sql_files
-
-- debug: 
-    var: sql_files
-
-
-- name: Copy/Unarchive sql files to .slac_mac directory
-  unarchive: 
-    copy: no 
-    dest: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}"  
-    mode: 755   
-    src: "/usr/local/grail/files/{{ item.stdout }} "
-  with_items:  "{{ sql_files }}"
-
-- name: Run drush sql-drop all on each site listed
-  command: drush sql-drop all 
-  args:
-    chdir="/var/sites/{{ item }}"
-  with_items:  "{{ slac_sites }}"
-  when:  not db_yes 
-
-- name: Load the database for each site
-  command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
-  args:
-    chdir="/var/sites/{{ item }}"
-  with_items:  "{{ slac_sites }}"
-  creates: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
-
-#Create SLAC-Sites.py script
-- name: Copy the SLAC-Sites.py to ~/bin
-  copy:
-    src: /Users/{{ ansible_user_id }}/.slac-mac/slac-sites.py
-    dest: /Users/{{ ansible_user_id }}/bin/slac-sites.py
-    owner: "{{ ansible_user_id }}"
-    mode: 0655
-# Put the SSH-Keys Documentation on the Desktop
-- name: Copy the SSH-Keys Documentation to the Desktop
-  copy:
-    src: /Users/{{ ansible_user_id }}/.slac-mac/ssh_keys.pdf
-    dest: /Users/{{ ansible_user_id }}/Desktop
-    owner: "{{ ansible_user_id }}"
-    mode: 0655
