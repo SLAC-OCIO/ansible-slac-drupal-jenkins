@@ -174,14 +174,18 @@
 
 # Check if the site has a DB currently
 - name: Check DB status
-  stat:  path="/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
+  stat:  
+  path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
   with_items:  "{{ slac_sites }}"
   register: db_yes 
+
+- debug: 
+    var: db_yes
 
 #Discover SQL dump archives
 - name: Get list of SQL archives
   find: 
-    paths: /Users/{{ ansible_user_id }}/.slac_mac
+    paths: "/Users/{{ ansible_user_id }}/.slac_mac"
     file_type: file
     patterns: "*.tar.gz"
     register: sql_files
@@ -189,10 +193,11 @@
 - debug: 
     var: sql_files
 
+
 - name: Copy/Unarchive sql files to .slac_mac directory
   unarchive: 
     copy: no 
-    dest: "/Users/{{ ansible_user_id }}/.slac_mac"  
+    dest: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}"  
     mode: 755   
     src: "/usr/local/grail/files/{{ item.stdout }} "
   with_items:  "{{ sql_files }}"
