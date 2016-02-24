@@ -147,17 +147,10 @@
 #Each Drupal site needs a settings file.  
 - name: Copy SLAC sites settings files
   copy: 
-<<<<<<< HEAD
     src: "{{ item.site_name }}.settings.php"
     dest: "{{ item.path}}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
   with_dict: "{{ slac_sites}}"
-=======
-    src: "{{ item }}.settings.php"
-    dest: "/var/sites/{{ item.site_name }}/sites/default/settings.php"
-    owner: "{{ ansible_user_id }}"
-  with_items: "{{ slac_sites }}"
->>>>>>> 544e581c3ff89fc47c81972f6e5560dacd2e2277
 
 #drush aliases make drupal development less challenging
 - name: Create drush aliases
