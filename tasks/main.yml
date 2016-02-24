@@ -177,7 +177,7 @@
   find: 
     paths: /Users/{{ slac_sites }}/.slac_mac
     file_type: file
-    patterns: *.tar.gz
+    patterns: "*.tar.gz"
     register: {{ sql_files }}
 
 - name: Copy/Unarchive sql files to .slac_mac directory
