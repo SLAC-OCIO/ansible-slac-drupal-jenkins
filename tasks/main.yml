@@ -147,7 +147,7 @@
 #Each Drupal site needs a settings file.  
 - name: Copy SLAC sites settings files
   copy: 
-    src: "{{ item.key }}.settings.php"
+    src: "{{ item.value.site_name }}.settings.php"
     dest: "{{ item.value.path}}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
   with_dict: "{{ slac_sites }}"
