@@ -50,13 +50,11 @@
     group: staff
     mode: 0777
 
-- debug:
-    dict: '{{ slac_sites }}'
 #Pull down the code, into the directories we just created
 - name: Get slac websites from Github
   git: 
-    repo: "{{ item.repo }}" 
-    dest: "/var/sites/{{ item.site_name }}"
+    repo: "{{ item.value.repo }}" 
+    dest: "/var/sites/{{ item.value.site_name }}"
     update: yes
     refspec: +refs/pull/*:refs/heads/*
   with_dict: "{{ slac_sites }}"
@@ -149,8 +147,8 @@
 #Each Drupal site needs a settings file.  
 - name: Copy SLAC sites settings files
   copy: 
-    src: "{{ item.site_name }}.settings.php"
-    dest: "{{ item.path}}/sites/default/settings.php"
+    src: "{{ item.value.key }}.settings.php"
+    dest: "{{ item.value.path}}/sites/default/settings.php"
     owner: "{{ ansible_user_id }}"
   with_dict: "{{ slac_sites }}"
 
@@ -158,7 +156,7 @@
 - name: Create drush aliases
   template:
     src: drushrc.php.j2
-    dest: "~/.drush/{{ item.site_name }}.php"
+    dest: "~/.drush/{{ item.value.site_name }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
   with_items:  "{{ slac_sites }}"
@@ -177,7 +175,7 @@
 # Check if the site has a DB currently
 - name: Check DB status
   stat:  
-    path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.site_name }}.db_yes"
+    path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
   with_items:  "{{ slac_sites }}"
   register: db_yes 
 
@@ -205,15 +203,15 @@
 - name: Run drush sql-drop all on each site listed
   command: drush sql-drop all 
   args:
-    chdir="/var/sites/{{ item.site_name }}"
+    chdir="/var/sites/{{ item.value.site_name }}"
   with_items:  "{{ slac_sites }}"
   when:  not db_yes 
 
 - name: Load the database for each site
   command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
   args:
-    chdir="/var/sites/{{ item .site_name }}"
-    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
+    chdir="/var/sites/{{ item .value.site_name }}"
+    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
   with_items:  "{{ slac_sites }}"
 
 
