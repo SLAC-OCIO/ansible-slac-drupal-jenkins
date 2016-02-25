@@ -49,7 +49,8 @@
     owner: "{{ ansible_user_id }}"
     group: staff
     mode: 0777
-
+- debug:
+    var: '{{ slac_sites }}'
 #Pull down the code, into the directories we just created
 - name: Get slac websites from Github
   git: 
