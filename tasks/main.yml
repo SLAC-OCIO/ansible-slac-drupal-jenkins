@@ -209,9 +209,9 @@
 
 - name: Load the database for each site
   command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
-      creates: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
   args:
     chdir="/var/sites/{{ item .site_name }}"
+    creates: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}.db_yes"
   with_items:  "{{ slac_sites }}"
 
 
