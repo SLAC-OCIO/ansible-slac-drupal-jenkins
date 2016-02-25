@@ -49,8 +49,9 @@
     owner: "{{ ansible_user_id }}"
     group: staff
     mode: 0777
+
 - debug:
-    var: '{{ slac_sites }}'
+    dict: '{{ slac_sites }}'
 #Pull down the code, into the directories we just created
 - name: Get slac websites from Github
   git: 
@@ -58,7 +59,7 @@
     dest: "/var/sites/{{ item.site_name }}"
     update: yes
     refspec: +refs/pull/*:refs/heads/*
-  with_items: "{{ slac_sites }}"
+  with_dict: "{{ slac_sites }}"
 
 #In order to have local dev, we must setup hosts entries
 # again, bug with Darwin and Ansible 2.0.2, loops and become
