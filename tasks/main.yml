@@ -202,8 +202,8 @@
   unarchive: 
     dest: '/usr/local/grail/files/sql_src'
     mode: 755   
-    src: "{{ item.path }} "
-  with_dict:  "{{ sql_files[files] }}"
+    src: "{{ item[0]path }} "
+  with_items:  "{{ sql_files }}"
 
 - name: Run drush sql-drop all on each site listed
   command: drush sql-drop all 
@@ -227,6 +227,7 @@
     dest: /Users/{{ ansible_user_id }}/bin/slac-sites.py
     owner: "{{ ansible_user_id }}"
     mode: 0655
+
 # Put the SSH-Keys Documentation on the Desktop
 - name: Copy the SSH-Keys Documentation to the Desktop
   copy:
