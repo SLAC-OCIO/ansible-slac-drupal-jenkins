@@ -181,10 +181,15 @@
 
 - debug: 
     var: db_yes
+- name: Make SQL directory
+  file:
+    path: '/usr/local/grail/files/sql_src'
+    state: directory
+
 #Discover SQL dump archives
 - name: Get list of SQL archives
   find: 
-    paths: "/Users/{{ ansible_user_id }}/.slac_mac"
+    paths: "/usr/local/grail/files"
     file_type: file
     patterns: "*.tar.gz"
     hidden: true
@@ -193,12 +198,11 @@
 - debug: 
     var: sql_files
 
-
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
-    dest: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item }}"  
+    dest: '/usr/local/grail/files/sql_src'
     mode: 755   
-    src: "/usr/local/grail/files/{{ item.stdout }} "
+    src: "{{ item.files.path }} "
   with_items:  "{{ sql_files }}"
 
 - name: Run drush sql-drop all on each site listed
@@ -206,7 +210,7 @@
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
   with_dict:  "{{ slac_sites }}"
-  when:  not db_yes 
+  when:  '{{ item.stat.exists = true }}'
 
 - name: Load the database for each site
   command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
