@@ -203,7 +203,7 @@
     dest: '/usr/local/grail/files/sql_src'
     mode: 755   
     src: "{{ item.path }} "
-  with_dict:  "{{ sql_files }}"
+  with_dict:  "{{ sql_files'[files]' }}"
 
 - name: Run drush sql-drop all on each site listed
   command: drush sql-drop all 
