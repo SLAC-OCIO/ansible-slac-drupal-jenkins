@@ -196,7 +196,7 @@
   register: sql_files
 
 - debug: 
-    var: '{{sql_files}}'
+    var: '{{sql_files.files}}'
 
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
@@ -209,7 +209,7 @@
   command: drush sql-drop all 
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
-  with_dict:  "{{ slac_sites }}"
+  with_dict:  "{{ slac_sites.results }}"
   when:  '{{ item.stat.exists == "true" }}'
 
 - name: Load the database for each site
