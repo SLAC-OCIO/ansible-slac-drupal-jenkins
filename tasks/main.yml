@@ -207,7 +207,7 @@
   with_items: '{{ sql_files.files }}'
 
 - name: Run drush sql-drop all on each site listed
-  command: drush sql-drop --yes
+  command: 'drush sql-drop --yes'
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
   with_items:  "{{ slac_sites.results }}"
