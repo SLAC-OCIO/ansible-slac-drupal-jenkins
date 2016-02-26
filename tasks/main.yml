@@ -156,7 +156,7 @@
 - name: Create drush aliases
   template:
     src: drushrc.php.j2
-    dest: "~/.drush/{{ item.value.site_name }}.php"
+    dest: "~/.drush/{{ item.value.site_name }}.drushrc.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
   with_dict:  "{{ slac_sites }}"
@@ -187,7 +187,7 @@
     paths: "/Users/{{ ansible_user_id }}/.slac_mac"
     file_type: file
     patterns: "*.tar.gz"
-    register: sql_files
+  register: sql_files
 
 - debug: 
     var: sql_files
