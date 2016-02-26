@@ -202,8 +202,10 @@
   unarchive: 
     dest: '/usr/local/grail/files/sql_src'
     mode: 755   
-    src: "{{ item[0].path }} "
-  with_items:  "{{ sql_files }}"
+    src: "{{ item.0.path }} "
+  with_subelements:  
+    - sql_files
+    - files
 
 - name: Run drush sql-drop all on each site listed
   command: drush sql-drop all 
