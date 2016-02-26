@@ -193,16 +193,16 @@
     file_type: file
     patterns: "*.tar.gz"
     hidden: true
-  register: sql_files
+  register: '{{ sql_files }}'
 
 - debug: 
-    var: '{{sql_files}}'
+    with_dict: '{{sql_files}}'
 
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
     dest: '/usr/local/grail/files/sql_src'
     mode: 755   
-    src: "{{ item.path }} "
+    src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
 
 - name: Run drush sql-drop all on each site listed
