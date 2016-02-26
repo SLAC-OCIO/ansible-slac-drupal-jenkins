@@ -187,6 +187,7 @@
     paths: "/Users/{{ ansible_user_id }}/.slac_mac"
     file_type: file
     patterns: "*.tar.gz"
+    hidden: true
   register: sql_files
 
 - debug: 
