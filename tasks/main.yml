@@ -196,7 +196,7 @@
   register: sql_files
 
 - debug: 
-    with_dict: '{{sql_files}}'
+    var: '{{sql_files}}'
 
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
