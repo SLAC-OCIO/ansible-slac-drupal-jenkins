@@ -193,7 +193,7 @@
     file_type: file
     patterns: "*.tar.gz"
     hidden: true
-  register: '{{ sql_files }}'
+  register: sql_files
 
 - debug: 
     with_dict: '{{sql_files}}'
