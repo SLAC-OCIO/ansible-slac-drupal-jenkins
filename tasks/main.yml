@@ -159,7 +159,7 @@
     dest: "~/.drush/{{ item.value.site_name }}.php"
     mode: 0755  
     owner: "{{ ansible_user_id }}"
-  with_items:  "{{ slac_sites }}"
+  with_dict:  "{{ slac_sites }}"
 
 #now that it's all configured, restart it.  Ansible needs OS-X specific directives 
 - name: Restart Apache2 (Darwin)
@@ -176,7 +176,7 @@
 - name: Check DB status
   stat:  
     path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
-  with_items:  "{{ slac_sites }}"
+  with_dict:  "{{ slac_sites }}"
   register: db_yes 
 
 - debug: 
@@ -204,7 +204,7 @@
   command: drush sql-drop all 
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
-  with_items:  "{{ slac_sites }}"
+  with_dict:  "{{ slac_sites }}"
   when:  not db_yes 
 
 - name: Load the database for each site
@@ -212,7 +212,7 @@
   args:
     chdir="/var/sites/{{ item .value.site_name }}"
     creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
-  with_items:  "{{ slac_sites }}"
+  with_dict:  "{{ slac_sites }}"
 
 
 #Create SLAC-Sites.py script
