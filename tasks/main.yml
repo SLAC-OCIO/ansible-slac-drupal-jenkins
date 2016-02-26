@@ -194,9 +194,9 @@
     patterns: "*.tar.gz"
     hidden: true
   register: sql_files
-  
+
 - name: Examin structure
-  debug:  var= sql_files
+  debug:  var=sql_files
 
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
