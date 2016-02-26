@@ -196,7 +196,7 @@
   register: sql_files
 
 - debug: 
-    var: '{{sql_files}}'
+    var1: '{{sql_files}}'
 
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
@@ -210,7 +210,7 @@
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
   with_dict:  "{{ slac_sites }}"
-  when:  '{{ item.stat.exists = true }}'
+  when:  '{{ item.stat.exists == "true" }}'
 
 - name: Load the database for each site
   command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
