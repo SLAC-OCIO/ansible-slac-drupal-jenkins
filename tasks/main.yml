@@ -189,7 +189,7 @@
 #Discover SQL dump archives
 - name: Get list of SQL archives
   find: 
-    paths: "/usr/local/grail/files"
+    paths: "/usr/local/grail/config/files"
     file_type: file
     patterns: "*.tar.gz"
     hidden: true
