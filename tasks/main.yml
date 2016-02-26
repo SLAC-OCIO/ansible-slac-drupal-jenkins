@@ -196,7 +196,7 @@
   register: sql_files
 
 - debug: 
-    var: '{{sql_files.files}}'
+    var= sql_files
 
 - name: Unarchive sql files to .slac_mac directory
   unarchive: 
