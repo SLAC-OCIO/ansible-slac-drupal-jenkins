@@ -226,11 +226,13 @@
   when:  '{{ item.stat.exists == "true" }}'
 
 - name: Load the database for each site
-  command: drush sql-cli < /usr/local/grail/files/{{ item.value.path}}  
+  command: drush sql-cli < {{ item[0].path}}  
   args:
-    chdir="/var/sites/{{ item.site_name }}"
+    chdir="/var/sites/{{ item[1].site_name }}"
     creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
-  with_items: '{{ sql_files_full.files }}'
+  with_nested: 
+    - sql_files_full.files
+    - slac_sites
 
 
 #Create SLAC-Sites.py script
