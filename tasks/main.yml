@@ -213,8 +213,8 @@
       file_type: file
       patterns: "*.sql"
       hidden: true
-    register: sql_files_full
-    
+  register: sql_files_full
+
 - name: debug sql_files_full
   debug: var=sql_files_full
 
