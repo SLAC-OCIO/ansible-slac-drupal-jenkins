@@ -209,7 +209,7 @@
 
 - name: Get list of unarchived files
   find: 
-      paths: "/usr/local/grail/config/files"
+      paths: "/usr/local/grail/files/sql_src"
       file_type: file
       patterns: "*.sql"
       hidden: true
