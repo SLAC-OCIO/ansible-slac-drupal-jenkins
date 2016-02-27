@@ -199,26 +199,38 @@
 - name: Examin structure
   debug:  var=sql_files
 
-- name: Unarchive sql files to .slac_mac directory
+- name: Unarchive sql files to sql_src dir
   unarchive: 
     dest: '/usr/local/grail/files/sql_src'
-    mode: 755   
+    mode: 755 
+    owner: '{{ ansible_user_id }}' 
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
+
+- name: Get list of unarchived files
+  find: 
+      paths: "/usr/local/grail/config/files"
+      file_type: file
+      patterns: "*.sql"
+      hidden: true
+    register: sql_files_full
+    
+- name: debug sql_files_full
+  debug: var=sql_files_full
 
 - name: Run drush sql-drop all on each site listed
   command: 'drush sql-drop --yes'
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
-  with_items:  "{{ slac_sites.results }}"
+  with_items:  "{{ db_yes.results }}"
   when:  '{{ item.stat.exists == "true" }}'
 
 - name: Load the database for each site
-  command: drush sql-cli < /Users/{{ ansible_user_id }}/files/{{ item }}  
+  command: drush sql-cli < /usr/local/grail/files/{{ item}}  
   args:
     chdir="/var/sites/{{ item .value.site_name }}"
     creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
-  with_dict:  "{{ slac_sites }}"
+  with_dict:  "{{ sql_files_full.results }}"
 
 
 #Create SLAC-Sites.py script
