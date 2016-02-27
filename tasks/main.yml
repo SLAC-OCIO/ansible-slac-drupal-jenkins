@@ -228,9 +228,9 @@
 - name: Load the database for each site
   command: drush sql-cli < /usr/local/grail/files/{{ item.value.path}}  
   args:
-    chdir="/var/sites/{{ item .value.site_name }}"
+    chdir="/var/sites/{{ item.site_name }}"
     creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
-  with_items:  "{{ sql_files_full.files }}"
+  with_items: '{{ sql_files_full.files }}''
 
 
 #Create SLAC-Sites.py script
@@ -238,7 +238,7 @@
   copy:
     src: /Users/{{ ansible_user_id }}/.slac-mac/slac-sites.py
     dest: /Users/{{ ansible_user_id }}/bin/slac-sites.py
-    owner: "{{ ansible_user_id }}"
+    owner: '{{ ansible_user_id }}''
     mode: 0655
 
 # Put the SSH-Keys Documentation on the Desktop
