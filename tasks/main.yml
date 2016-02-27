@@ -230,7 +230,7 @@
   args:
     chdir="/var/sites/{{ item .value.site_name }}"
     creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
-  with_dict:  "{{ sql_files_full.files }}"
+  with_items:  "{{ sql_files_full.files }}"
 
 
 #Create SLAC-Sites.py script
