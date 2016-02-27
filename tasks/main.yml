@@ -170,7 +170,7 @@
 
 #This builds a website locally, slac-features specifically
 - name: Build sites locally
-  command: "/usr/local/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
+  command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
 
 # Check if the site has a DB currently
 - name: Check DB status
