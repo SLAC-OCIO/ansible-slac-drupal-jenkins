@@ -8,5 +8,4 @@ galaxy_info:
 
 dependencies: 
   - slac.grail-mysql
-  - slac.grail-php
   - slac.grail-drush
