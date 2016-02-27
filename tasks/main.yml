@@ -228,11 +228,12 @@
 - name: Load the database for each site
   command: drush sql-cli < {{ item[0].path}}  
   args:
-    chdir="/var/sites/{{ item[1].site_name }}"
+    chdir="/var/sites/{{ item[1].value.site_name }}"
     creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.key}}.db_yes"
   with_nested: 
     - sql_files_full.files
     - slac_sites
+  debug: results
 
 
 #Create SLAC-Sites.py script
