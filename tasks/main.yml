@@ -227,7 +227,7 @@
     login_unix_socket: '/tmp/mysql.sock'
     name: all 
     state: import 
-    target: "/usr/local/grail/files/sql_src{{ item.value.site_name }}.sql"  
+    target: "/usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql"  
   with_dict: '{{ slac_sites }}'
 
 #Create SLAC-Sites.py script
