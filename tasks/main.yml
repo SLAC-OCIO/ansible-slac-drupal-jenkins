@@ -213,7 +213,7 @@
 
 #Install the lib to run the DB add
 - name: pip mysqllib
-  pip: name='mysql-python' state='present'  
+  pip: name='MySQL-python' state='present'  become=yes
 
 #Add databases 
 - name: Add the Databases if they don't exist
