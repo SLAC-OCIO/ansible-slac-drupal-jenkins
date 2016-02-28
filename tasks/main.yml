@@ -212,7 +212,7 @@
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
   with_items:  "{{ db_yes.results }}"
-  when:  '{{ item.stat.exists == "true" }}'
+  when:  '{{ item.stat.exists == true }}'
 
 - name: Add the Databases if they Don't exist
   mysql_db: 
@@ -220,7 +220,6 @@
     name: '{{ item.value.site_name }}'  
     state: import 
     target: "/usr/local/grail/files/sql_src{{ item.value.site_name }}.sql"  
-  when: '{{ item.stat.exists == "true" }}'
   with_items: '{{ slac_sites }}'
 
 #Create SLAC-Sites.py script
