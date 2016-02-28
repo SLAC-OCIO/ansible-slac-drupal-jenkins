@@ -166,6 +166,23 @@
   with_items:
     - org.apache.httpd
 
+#Install the lib to run the DB add
+- name: Install the python mysql library
+  become: yes
+  pip: 
+    name: 'MySQL-python' 
+    state: present
+    
+#Add databases 
+- name: Add the Databases if they don't exist
+  mysql_db: 
+    login_user: 'root'
+    login_password: ''
+    login_unix_socket: '/tmp/mysql.sock'
+    name: '{{ item.value.site_name }}'
+    state: present
+  with_dict: '{{ slac_sites }}'
+
 #This builds a website locally, slac-features specifically
 - name: Build sites locally
   command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
@@ -177,7 +194,7 @@
   with_dict:  "{{ slac_sites }}"
   register: db_yes 
 
-#Create directory
+#Create our SQL dump directory
 - name: Make SQL directory
   file:
     path: '/usr/local/grail/files/sql_src'
@@ -209,25 +226,8 @@
   with_items:  "{{ db_yes.results }}"
   when:  '{{ item.stat.exists == true }}'
 
-#Install the lib to run the DB add
-- name: pip mysqllib
-  become: yes
-  pip: 
-    name: 'MySQL-python' 
-    state: present
-    
 #Add databases 
-- name: Add the Databases if they don't exist
-  mysql_db: 
-    login_user: 'root'
-    login_password: ''
-    login_unix_socket: '/tmp/mysql.sock'
-    name: '{{ item.value.site_name }}'
-    state: present
-  with_dict: '{{ slac_sites }}'
-
-#Add databases 
-- name: Import dumps
+- name: Import database dumps
   mysql_db: 
     login_user: 'root'
     login_password: ''
