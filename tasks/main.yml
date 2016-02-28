@@ -207,17 +207,6 @@
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
 
-- name: Get list of unarchived files
-  find: 
-      paths: "/usr/local/grail/files/sql_src"
-      file_type: file
-      patterns: "*.sql"
-      hidden: true
-  register: sql_files_full
-
-- name: debug sql_files_full
-  debug: var=sql_files_full
-
 - name: Run drush sql-drop all on each site listed
   command: 'drush sql-drop --yes'
   args:
@@ -226,13 +215,11 @@
   when:  '{{ item.stat.exists == "true" }}'
 
 - name: Load the database for each site
-  command: drush sql-cli < {{ item.0.path}}  
+  command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
   args:
-    chdir="/var/sites/{{ item.1.site_name }}"
-    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.1.key}}.db_yes"
-  with_nested: 
-    - sql_files_full.files
-    - slac_sites
+    chdir="/var/sites/{{ item.value.site_name }}"
+    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
+  with_dict: "{{ slac_sites }}"
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
