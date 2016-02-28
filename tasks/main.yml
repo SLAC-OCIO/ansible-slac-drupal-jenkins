@@ -231,12 +231,12 @@
   with_dict: '{{ slac_sites }}'
 
 #Create SLAC-Sites.py script
-- name: Copy the SLAC-Sites.py to ~/bin
-  copy:
-    src: /Users/{{ ansible_user_id }}/.slac-mac/slac-sites.py
-    dest: /Users/{{ ansible_user_id }}/bin/slac-sites.py
-    owner: '{{ ansible_user_id }}'
-    mode: 0655
+#- name: Copy the SLAC-Sites.py to ~/bin
+# copy:
+#   src: /Users/{{ ansible_user_id }}/.slac-mac/slac-sites.py
+#    dest: /Users/{{ ansible_user_id }}/bin/slac-sites.py
+#    owner: '{{ ansible_user_id }}'
+#    mode: 0655
 
 # Put the SSH-Keys Documentation on the Desktop
 - name: Copy the SSH-Keys Documentation to the Desktop
