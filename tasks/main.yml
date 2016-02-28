@@ -231,7 +231,7 @@
   with_dict: '{{ slac_sites }}'
 
 #Create SLAC-Sites.py script
-#- name: Copy the SLAC-Sites.py to ~/bin
+- name: Copy the SLAC-Sites.py to ~/bin
   copy:
     src: ~/.slac-mac/slac-sites.py
     dest: ~/bin/slac-sites.py
