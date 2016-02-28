@@ -68,8 +68,7 @@
     dest: /etc/hosts
     create: true 
     line: "127.0.0.1 slac-features"
-    state: present
-  
+    state: present  
 
 - name: Update /etc/hosts 2
   become: true
@@ -78,8 +77,7 @@
     dest: /etc/hosts
     create: true 
     line: "127.0.0.1 slac-gtw"
-    state: present
-  
+    state: present  
 
 - name: Update /etc/hosts 3
   become: true
@@ -224,7 +222,7 @@
     login_user: 'root'
     login_password: ''
     login_unix_socket: '/tmp/mysql.sock'
-    name: all 
+    name: '{{ item.value.site_name }}'
     state: present
   with_dict: '{{ slac_sites }}'
 
