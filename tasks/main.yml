@@ -213,8 +213,8 @@
 
 #Install the lib to run the DB add
 - name: pip mysqllib
-  pip: 
   become: yes
+  pip: 
     name: MySQL-python' 
     state: 'present'  
     
