@@ -211,8 +211,12 @@
   with_items:  "{{ db_yes.results }}"
   when:  '{{ item.stat.exists == true }}'
 
+#Install the lib to run the DB add
+- name: pip mysqllib
+  pip: name='mysqldb' state='present'  
+  
 #Add databases 
-- name: Add the Databases if they Don't exist
+- name: Add the Databases if they don't exist
   mysql_db: 
     login_unix_socket: '/tmp/mysql.sock'
     name: '{{ item.value.site_name }}'  
