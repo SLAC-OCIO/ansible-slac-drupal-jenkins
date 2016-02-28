@@ -179,9 +179,7 @@
   with_dict:  "{{ slac_sites }}"
   register: db_yes 
 
-- debug: 
-    var: db_yes
-
+#Create directory
 - name: Make SQL directory
   file:
     path: '/usr/local/grail/files/sql_src'
@@ -196,9 +194,7 @@
     hidden: true
   register: sql_files
 
-- name: Examin structure
-  debug:  var=sql_files
-
+#Decompress archives
 - name: Unarchive sql files to sql_src dir
   unarchive: 
     dest: '/usr/local/grail/files/sql_src'
@@ -207,6 +203,7 @@
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
 
+#This may go away
 - name: Run drush sql-drop all on each site listed
   command: 'drush sql-drop --yes'
   args:
@@ -214,9 +211,7 @@
   with_items:  "{{ db_yes.results }}"
   when:  '{{ item.stat.exists == true }}'
 
-- name: Examin structure
-  debug:  var=slac_sites
-
+#Add databases 
 - name: Add the Databases if they Don't exist
   mysql_db: 
     login_unix_socket: '/tmp/mysql.sock'
