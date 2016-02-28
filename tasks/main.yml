@@ -218,9 +218,18 @@
     name: 'MySQL-python' 
     state: present
     
-
 #Add databases 
 - name: Add the Databases if they don't exist
+  mysql_db: 
+    login_user: 'root'
+    login_password: ''
+    login_unix_socket: '/tmp/mysql.sock'
+    name: all 
+    state: present
+  with_dict: '{{ slac_sites }}'
+
+#Add databases 
+- name: Import dumps
   mysql_db: 
     login_user: 'root'
     login_password: ''
