@@ -214,12 +214,19 @@
   with_items:  "{{ db_yes.results }}"
   when:  '{{ item.stat.exists == "true" }}'
 
-- name: Load the database for each site
-  command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
-  args:
-    chdir="/var/sites/{{ item.value.site_name }}"
-    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
-  with_dict: "{{ slac_sites }}"
+ - name: Add the Databases if they Don't exist
+   mysql_db: 
+      collation:  
+      encoding:  
+      login_host: localhost  
+      login_password:''  
+      login_unix_socket: '/tmp/mysql.sock'
+      login_user: 'root'
+      name: '{{ item.value.site_name }}'  
+      state: import 
+      target: "/usr/local/grail/files/sql_src{{ item.value.site_name }}.sql"  
+    when:  when:  '{{ item.stat.exists == "true" }}'
+    with_items: '{{ slac_sites }}'
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
