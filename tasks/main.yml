@@ -216,12 +216,14 @@
   become: yes
   pip: 
     name: 'MySQL-python' 
-    state: 'present'  
+    state: present
     
 
 #Add databases 
 - name: Add the Databases if they don't exist
   mysql_db: 
+    login_user: 'root'
+    login_password: ''
     login_unix_socket: '/tmp/mysql.sock'
     name: '{{ item.value.site_name }}'  
     state: import 
