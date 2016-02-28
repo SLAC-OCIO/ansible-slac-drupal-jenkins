@@ -215,7 +215,7 @@
 - name: pip mysqllib
   become: yes
   pip: 
-    name: MySQL-python' 
+    name: 'MySQL-python' 
     state: 'present'  
     
 
