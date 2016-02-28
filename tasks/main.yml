@@ -198,7 +198,7 @@
 - name: Unarchive sql files to sql_src dir
   unarchive: 
     dest: '/usr/local/grail/files/sql_src'
-    mode: 755 
+    mode: 655 
     owner: '{{ ansible_user_id }}' 
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
@@ -225,7 +225,7 @@
     login_user: 'root'
     login_password: ''
     login_unix_socket: '/tmp/mysql.sock'
-    name: '{{ item.value.site_name }}'  
+    name: all 
     state: import 
     target: "/usr/local/grail/files/sql_src{{ item.value.site_name }}.sql"  
   with_dict: '{{ slac_sites }}'
