@@ -13,7 +13,7 @@
 $update_free_access = FALSE;
 $drupal_hash_salt = '5901afkjshfq3875yfij9487';
 
- $base_url = 'http://slac-features';  // NO trailing slash!
+$base_url = 'http://slac-features';  // NO trailing slash!
 
 ini_set('session.gc_probability', 1);
 ini_set('session.gc_divisor', 100);

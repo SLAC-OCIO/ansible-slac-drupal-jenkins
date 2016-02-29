@@ -263,11 +263,20 @@
 #  with_dict: '{{ slac_sites }}'
 
 #This builds a website locally, slac-features specifically
+
+
 - name: Build sites locally
   command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
 
 
 # END databases -----------------------------------------------------------------------
+
+# Begin Drupal
+#create  sitename/sites/default/files directory
+- name: Add Drupal Files dir.
+  file: mode=0777  owner='{{ ansible_user_id }}'  path="/var/sites/{{ item.value.site_name }}/sites/default/files"  state=directory  
+  with_dict:  '{{ slac_sites }}'
+
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
