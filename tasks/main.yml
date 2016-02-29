@@ -191,7 +191,7 @@
   register: db_yes=true
 
 - name: Get Var status
-  debug: var= '{{ db_yes }}''
+  debug: var= '{{ db_yes }}'
   
 # drop DB's from before
 - name: drop DB's with bash
