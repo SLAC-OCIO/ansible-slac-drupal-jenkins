@@ -227,7 +227,7 @@
 #  when:  '{{ item.stat.exists == true }}'
 - name: create DB's with 
   command: mysql -uroot -p -e "create database '{{ item.value.site_name }}'" 
-    executable:  /usr/local/bin/bash 
+  executable:  /usr/local/bin/bash 
   when:  variable is defined
   with_dict: "{{ slac_sites }}"
 
