@@ -225,10 +225,11 @@
 #    chdir="/var/sites/{{ item.value.site_name }}"
 #  with_items:  "{{ db_yes.results }}"
 #  when:  '{{ item.stat.exists == true }}'
+
 - name: create DB's with 
   command: mysql -uroot -p -e "create database '{{ item.value.site_name }}'" 
-  executable:  /usr/local/bin/bash 
-  when:  variable is defined
+  args: 
+    executable="/usr/local/bin/bash"
   with_dict: "{{ slac_sites }}"
 
 
