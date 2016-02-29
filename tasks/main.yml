@@ -188,7 +188,7 @@
   stat:  
     path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
   with_dict:  "{{ slac_sites }}"
-  register: db_yes=true
+  register: db_yes
 
 - name: Get Var status
   debug: var= '{{ db_yes }}'
