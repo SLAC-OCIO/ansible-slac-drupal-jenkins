@@ -229,7 +229,7 @@
 - name: create DB's with 
   command: mysql -uroot -p -e "create database '{{ item.value.site_name }}'" 
   args: 
-    executable="/usr/local/bin/bash"
+    executable=/usr/local/bin/bash
   with_dict: "{{ slac_sites }}"
 
 
