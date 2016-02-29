@@ -199,7 +199,8 @@
 #create only the DB Structure
 - name: create DB's with bash
   command: 'mysqladmin create {{ item.value.site_name }} -uroot '
-    creates: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
+    args:
+      creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
   with_dict: "{{ slac_sites }}"
   
 #Create our SQL dump directory
