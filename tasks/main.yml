@@ -175,6 +175,22 @@
 #    name: '{{ item.value.site_name }}'
 #    state: present
 #  with_dict: '{{ slac_sites }}'
+- name: Get drupal DB status
+  command: drush status | grep -i "Bootstrap" | awk -F":  " '{print $NF}'
+  args:
+    chdir="/var/sites/{{ item.value.site_name }}"
+  with_dict: "{{ slac_sites }}"
+  register: drupal-db-populated  
+
+- name: create DB's with bash
+  command: 'mysqladmin create {{ item.value.site_name }} -uroot '
+  with_dict: "{{ slac_sites }}"
+  when: drupal-db-populated.result.stdout != "Successful" 
+
+- name: load DB's with bash
+  command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
+  with_dict: "{{ slac_sites }}"
+  when: drupal-db-populated.result.stdout != "Successful" 
 
 #This builds a website locally, slac-features specifically
 - name: Build sites locally
@@ -219,15 +235,6 @@
 #  with_items:  "{{ db_yes.results }}"
 #  when:  '{{ item.stat.exists == true }}'
 
-
-
-- name: create DB's with bash
-  command: 'mysqladmin create {{ item.value.site_name }} -uroot '
-  with_dict: "{{ slac_sites }}"
-
-- name: load DB's with bash
-  command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
-  with_dict: "{{ slac_sites }}"
 
 #- name: Load the database for each site
 # command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
