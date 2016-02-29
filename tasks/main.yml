@@ -174,14 +174,14 @@
     state: present
     
 #Add databases 
-- name: Add the Databases if they don't exist
-  mysql_db: 
-    login_user: 'root'
-    login_password: ''
-    login_unix_socket: '/tmp/mysql.sock'
-    name: '{{ item.value.site_name }}'
-    state: present
-  with_dict: '{{ slac_sites }}'
+#- name: Add the Databases if they don't exist
+#  mysql_db: 
+#    login_user: 'root'
+#    login_password: ''
+#    login_unix_socket: '/tmp/mysql.sock'
+#    name: '{{ item.value.site_name }}'
+#    state: present
+#  with_dict: '{{ slac_sites }}'
 
 #This builds a website locally, slac-features specifically
 - name: Build sites locally
@@ -219,23 +219,41 @@
   with_items: '{{ sql_files.files }}'
 
 #This may go away
-- name: Run drush sql-drop all on each site listed
-  command: 'drush sql-drop --yes'
+#- name: Run drush sql-drop all on each site listed
+#  command: 'drush sql-drop --yes'
+#  args:
+#    chdir="/var/sites/{{ item.value.site_name }}"
+#  with_items:  "{{ db_yes.results }}"
+#  when:  '{{ item.stat.exists == true }}'
+- name: create DB's with 
+  command: mysql -uroot -p -e "create database '{{ item.value.site_name }}'" 
+    creates:  
+    executable:  /usr/local/bin/bash
+    free_form:  
+    removes:  
+    warn:  
+  when:  variable is defined
+  with_dict: "{{ slac_sites }}"
+
+
+
+- name: Load the database for each site
+  command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
   args:
     chdir="/var/sites/{{ item.value.site_name }}"
-  with_items:  "{{ db_yes.results }}"
-  when:  '{{ item.stat.exists == true }}'
+    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
+  with_dict: "{{ slac_sites }}"
 
 #Add databases 
-- name: Import database dumps
-  mysql_db: 
-    login_user: 'root'
-    login_password: ''
-    login_unix_socket: '/tmp/mysql.sock'
-    name: '{{ item.value.site_name }}'
-    state: import 
-    target: "/usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql"  
-  with_dict: '{{ slac_sites }}'
+#- name: Import database dumps
+#  mysql_db: 
+#    login_user: 'root'
+#    login_password: ''
+#    login_unix_socket: '/tmp/mysql.sock'
+#    name: '{{ item.value.site_name }}'
+#    state: import 
+#    target: "/usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql"  
+#  with_dict: '{{ slac_sites }}'
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
