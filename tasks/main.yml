@@ -225,14 +225,16 @@
   command: 'mysqladmin create {{ item.value.site_name }} -uroot '
   with_dict: "{{ slac_sites }}"
 
-
-
-- name: Load the database for each site
-  command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
-  args:
-    chdir="/var/sites/{{ item.value.site_name }}"
-    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
+- name: load DB's with bash
+  command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
   with_dict: "{{ slac_sites }}"
+
+#- name: Load the database for each site
+# command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
+#  args:
+#    chdir="/var/sites/{{ item.value.site_name }}"
+#    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
+#  with_dict: "{{ slac_sites }}"
 
 #Add databases 
 #- name: Import database dumps
