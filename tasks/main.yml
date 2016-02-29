@@ -231,9 +231,9 @@
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
 
-- name: load DB's with bash
-  command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
-  with_dict: "{{ slac_sites }}"
+#- name: load DB's with bash
+# command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
+# with_dict: "{{ slac_sites }}"
 
 #This may go away
 #- name: Run drush sql-drop all on each site listed
@@ -267,7 +267,7 @@
   command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
 
 
-# databases -----------------------------------------------------------------------
+# END databases -----------------------------------------------------------------------
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
