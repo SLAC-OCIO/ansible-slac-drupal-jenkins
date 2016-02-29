@@ -190,6 +190,9 @@
   with_dict:  "{{ slac_sites }}"
   register: db_yes=true
 
+- name: Get Var status
+  debug: var= '{{ db_yes }}''
+  
 # drop DB's from before
 - name: drop DB's with bash
   command: "mysqladmin create {{ item.value.site_name }} -uroot"
