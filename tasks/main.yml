@@ -1,4 +1,5 @@
 ---
+#apache begin ------------------------------------------------------------------------------------
 #Each website needs a cooresponding virtualhost for apache to know where it is
 #We create that directory
 - name: Create vhost directory
@@ -165,7 +166,11 @@
   command: "launchctl load -w /System/Library/LaunchDaemons/{{item}}.plist"
   with_items:
     - org.apache.httpd
-    
+ 
+#Apache End   -------------------------------------------------------------------------------
+
+
+#databases -----------------------------------------------------------------------------------
 #Add databases 
 #- name: Add the Databases if they don't exist
 #  mysql_db: 
@@ -175,33 +180,22 @@
 #    name: '{{ item.value.site_name }}'
 #    state: present
 #  with_dict: '{{ slac_sites }}'
-- name: Get drupal DB status
-  command: drush status | grep -i "Bootstrap" | awk -F":  " '{print $NF}'
-  args:
-    chdir="/var/sites/{{ item.value.site_name }}"
-  with_dict: "{{ slac_sites }}"
-  register: drupal-db-populated  
-
-- name: create DB's with bash
-  command: 'mysqladmin create {{ item.value.site_name }} -uroot '
-  with_dict: "{{ slac_sites }}"
-  when: drupal-db-populated.result.stdout != "Successful" 
-
-- name: load DB's with bash
-  command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
-  with_dict: "{{ slac_sites }}"
-  when: drupal-db-populated.result.stdout != "Successful" 
-
-#This builds a website locally, slac-features specifically
-- name: Build sites locally
-  command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
-
 # Check if the site has a DB currently
 - name: Check DB status
   stat:  
     path: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
   with_dict:  "{{ slac_sites }}"
-  register: db_yes 
+  register: db_yes=true
+
+- name: drop DB's with bash
+  command: 'mysqladmin create {{ item.value.site_name }} -uroot '
+  with_dict: "{{ slac_sites }}"
+  when:  '{{ db_yes == true }}'
+
+- name: create DB's with bash
+  command: 'mysqladmin create {{ item.value.site_name }} -uroot '
+  with_dict: "{{ slac_sites }}"
+  creates: "/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
 
 #Create our SQL dump directory
 - name: Make SQL directory
@@ -226,6 +220,10 @@
     owner: '{{ ansible_user_id }}' 
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
+
+- name: load DB's with bash
+  command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
+  with_dict: "{{ slac_sites }}"
 
 #This may go away
 #- name: Run drush sql-drop all on each site listed
@@ -253,6 +251,13 @@
 #    state: import 
 #    target: "/usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql"  
 #  with_dict: '{{ slac_sites }}'
+
+#This builds a website locally, slac-features specifically
+- name: Build sites locally
+  command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
+
+
+# databases -----------------------------------------------------------------------
 
 #Create SLAC-Sites.py script
 - name: Copy the SLAC-Sites.py to ~/bin
