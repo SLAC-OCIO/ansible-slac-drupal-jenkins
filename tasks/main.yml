@@ -165,23 +165,16 @@
   command: "launchctl load -w /System/Library/LaunchDaemons/{{item}}.plist"
   with_items:
     - org.apache.httpd
-
-#Install the lib to run the DB add
-- name: Install the python mysql library
-  become: yes
-  pip: 
-    name: 'MySQL-python' 
+   
+Add databases 
+- name: Add the Databases if they don't exist
+  mysql_db: 
+    login_user: 'root'
+    login_password: ''
+    login_unix_socket: '/tmp/mysql.sock'
+    name: '{{ item.value.site_name }}'
     state: present
-    
-#Add databases 
-#- name: Add the Databases if they don't exist
-#  mysql_db: 
-#    login_user: 'root'
-#    login_password: ''
-#    login_unix_socket: '/tmp/mysql.sock'
-#    name: '{{ item.value.site_name }}'
-#    state: present
-#  with_dict: '{{ slac_sites }}'
+  with_dict: '{{ slac_sites }}'
 
 #This builds a website locally, slac-features specifically
 - name: Build sites locally
@@ -226,11 +219,19 @@
 #  with_items:  "{{ db_yes.results }}"
 #  when:  '{{ item.stat.exists == true }}'
 
+#chdir = cd into this directory before running the command
+#creates = a filename, when it already exists, this step will *not* be run.
+#executable = change the shell used to execute the command. Should be an absolute path to the executable.
+#free_form = the command module takes a free form command to run.  There is no parameter actually named 'free form'. See the examples!
+#removes = a filename, when it does not exist, this step will *not* be run.
+#warn = if command warnings are on in ansible.cfg, do not warn about this particular line if set to no/false.
+- name: Export MySQL Client Library Location.
+  command: "export DYLD_LIBRARY_PATH=/usr/local/mysql-5.5.15-osx10.6-x86/lib/:$DYLD_LIBRARY_PATH" 
+
+
 - name: create DB's with bash
   command: mysql -uroot -p -e "create database '{{ item.value.site_name }}'" 
   with_dict: "{{ slac_sites }}"
-
-
 
 - name: Load the database for each site
   command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
