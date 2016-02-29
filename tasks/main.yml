@@ -226,10 +226,8 @@
 #  with_items:  "{{ db_yes.results }}"
 #  when:  '{{ item.stat.exists == true }}'
 
-- name: create DB's with 
+- name: create DB's with bash
   command: mysql -uroot -p -e "create database '{{ item.value.site_name }}'" 
-  args: 
-    executable=/usr/local/bin/bash
   with_dict: "{{ slac_sites }}"
 
 
