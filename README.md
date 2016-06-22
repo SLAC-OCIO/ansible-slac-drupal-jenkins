@@ -9,8 +9,9 @@ DevOps Team Jenkins 'server-buildout' job completed
 
 Role Variables
 --------------
+
 [slac-sites]
-'''
+
   slac_sites:
       www: 
         site_name: slac-www
@@ -24,7 +25,7 @@ Role Variables
         site_name: slac-gtw
         repo: "https://github.com/slac-ocio/slac-gtw"
         path: /var/www/slac-gtw
-'''
+
 Dependencies
 ------------
 
