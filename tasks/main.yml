@@ -1,147 +1,12 @@
 ---
-#apache begin ------------------------------------------------------------------------------------
-#Each website needs a cooresponding virtualhost for apache to know where it is
-#We create that directory
-- name: Create vhost directory
-  become: yes
-  file:
-    path: "{{item}}"
-    state: directory
-    owner: root
-    group: wheel
-    mode: 0777
-  with_items:
-    - /etc/apache2/virtualhosts
-#Ansible 2.0 has a bug with Darwin, wherein loops and become don't work together
-#TODO: Refactor into loops when the patch is pushed    
-- name: Copy virtualhost files
-  become: yes
-  copy:
-    src: files/slac_features.conf
-    dest: /etc/apache2/virtualhosts/slac_features.conf
-    owner: root
-    group: wheel
-    mode: 0655
-
-- name: Copy virtualhost files part 2
-  become: yes
-  copy:
-    src: files/slac_gtw.conf
-    dest: /etc/apache2/virtualhosts/slac_gtw.conf
-    owner: root
-    group: wheel
-    mode: 0655
-
-- name: Copy virtualhost files part 3
-  become: yes
-  copy:
-    src: files/slac_www.conf
-    dest: /etc/apache2/virtualhosts/slac_www.conf
-    owner: root
-    group: wheel
-    mode: 0655
-
-#Make the appropriate directory for the websites
-- name: Create each sites directory
-  become: yes
-  file:
-    path: "{{website_path}}"
-    state: directory
-    owner: "{{ ansible_user_id }}"
-    group: staff
-    mode: 0777
-
 #Pull down the code, into the directories we just created
 - name: Get slac websites from Github
   git: 
     repo: "{{ item.value.repo }}" 
-    dest: "/var/sites/{{ item.value.site_name }}"
+    dest: "/var/www/{{ item.value.site_name }}"
     update: yes
     refspec: +refs/pull/*:refs/heads/*
   with_dict: "{{ slac_sites }}"
-
-#In order to have local dev, we must setup hosts entries
-# again, bug with Darwin and Ansible 2.0.2, loops and become
-- name: Update /etc/hosts 1
-  become: true
-  lineinfile:
-    backup: true 
-    dest: /etc/hosts
-    create: true 
-    line: "127.0.0.1 slac-features"
-    state: present  
-
-- name: Update /etc/hosts 2
-  become: true
-  lineinfile:
-    backup: true 
-    dest: /etc/hosts
-    create: true 
-    line: "127.0.0.1 slac-gtw"
-    state: present  
-
-- name: Update /etc/hosts 3
-  become: true
-  lineinfile:
-    backup: true 
-    dest: /etc/hosts
-    create: true 
-    line: "127.0.0.1 slac-www"
-    state: present
-
-#Log directories are essential  
-- name: Add log dir 1
-  become: true
-  file: 
-    path: /var/log/slac-www/logs
-    state: directory
-    
-
-- name: Add log dir 2
-  become: true
-  file: 
-    path: /var/log/slac-gtw/logs
-    state: directory
-    
-
-- name: Add log dir 3
-  become: true
-  file: 
-    path: /var/log/slac-features/logs
-    state: directory
-    
-#We tell apache to load out virtualhost configs
-- name: Enable virtualhosts in Apache2
-  become: yes
-  lineinfile:
-    backup: true  
-    dest: /etc/apache2/httpd.conf  
-    group: wheel  
-    insertafter: "^Include /private/etc/apache2/other/*.conf" 
-    line: "Include /private/etc/apache2/virtualhosts/*"  
-    state: present 
-
-#This quiets the hostname error
-- name: Set Hostname
-  become: yes
-  lineinfile:
-    backup: true  
-    dest: /etc/apache2/httpd.conf
-    regexp: "^#ServerName www.example.com:80"  
-    group: wheel
-    line: "ServerName localhost"  
-    state: present 
-
-#Set an admin email for Apache2
-- name: Set Admin Email
-  become: yes
-  lineinfile:
-    backup: true  
-    dest: /etc/apache2/httpd.conf
-    regexp: "^#ServerName you@example.com"  
-    group: wheel
-    line: "ServerAdmin {{ git_user_email }}"  
-    state: present 
 
 #Each Drupal site needs a settings file.  
 - name: Copy SLAC sites settings files
@@ -160,29 +25,6 @@
     owner: "{{ ansible_user_id }}"
   with_dict:  "{{ slac_sites }}"
 
-#now that it's all configured, restart it.  Ansible needs OS-X specific directives 
-- name: Restart Apache2 (Darwin)
-  become: yes
-  command: "launchctl load -w /System/Library/LaunchDaemons/{{item}}.plist"
-  with_items:
-    - org.apache.httpd
- 
-#Apache End   -------------------------------------------------------------------------------
-
-
-#databases -----------------------------------------------------------------------------------
-#Add databases 
-#- name: Add the Databases if they don't exist
-#  mysql_db: 
-#    login_user: 'root'
-#    login_password: ''
-#    login_unix_socket: '/tmp/mysql.sock'
-#    name: '{{ item.value.site_name }}'
-#    state: present
-#  with_dict: '{{ slac_sites }}'
-
-
-
 # Check if the site has a DB currently
 - name: Check DB status
   stat:  
@@ -198,29 +40,7 @@
   command: "mysqladmin create {{ item.value.site_name }} -uroot"
   with_dict: "{{ slac_sites }}"
   when:  '{{ db_yes == true }}'
-
-#create only the DB Structure
-- name: create DB's with bash
-  command: "mysqladmin create {{ item.value.site_name }} -uroot"
-  args:
-    chdir="/var/sites/{{ item.value.site_name }}"
-    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
-  with_dict: "{{ slac_sites }}"
   
-#Create our SQL dump directory
-- name: Make SQL directory
-  file:
-    path: '/usr/local/grail/files/sql_src'
-    state: directory
-
-#Discover SQL dump archives
-- name: Get list of SQL archives
-  find: 
-    paths: "/usr/local/grail/config/files"
-    file_type: file
-    patterns: "*.tar.gz"
-    hidden: true
-  register: sql_files
 
 #Decompress archives
 - name: Unarchive sql files to sql_src dir
@@ -231,39 +51,8 @@
     src: "{{ item.path }}"
   with_items: '{{ sql_files.files }}'
 
-#- name: load DB's with bash
-# command: 'mysql {{ item.value.site_name }} < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql -uroot '
-# with_dict: "{{ slac_sites }}"
-
-#This may go away
-#- name: Run drush sql-drop all on each site listed
-#  command: 'drush sql-drop --yes'
-#  args:
-#    chdir="/var/sites/{{ item.value.site_name }}"
-#  with_items:  "{{ db_yes.results }}"
-#  when:  '{{ item.stat.exists == true }}'
-
-
-#- name: Load the database for each site
-# command: drush sql-cli < /usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql 
-#  args:
-#    chdir="/var/sites/{{ item.value.site_name }}"
-#    creates="/Users/{{ ansible_user_id }}/.slac_mac/{{ item.value.site_name }}.db_yes"
-#  with_dict: "{{ slac_sites }}"
-
-#Add databases 
-#- name: Import database dumps
-#  mysql_db: 
-#    login_user: 'root'
-#    login_password: ''
-#    login_unix_socket: '/tmp/mysql.sock'
-#    name: '{{ item.value.site_name }}'
-#    state: import 
-#    target: "/usr/local/grail/files/sql_src/{{ item.value.site_name }}.sql"  
-#  with_dict: '{{ slac_sites }}'
 
 #This builds a website locally, slac-features specifically
-
 
 - name: Build sites locally
   command: "/usr/bin/php /var/sites/slac-features/rebuild/slac_ext_org.php"
@@ -278,18 +67,3 @@
   with_dict:  '{{ slac_sites }}'
 
 
-#Create SLAC-Sites.py script
-- name: Copy the SLAC-Sites.py to ~/bin
-  copy:
-    src: ~/.slac-mac/slac-sites.py
-    dest: ~/bin/slac-sites.py
-    owner: '{{ ansible_user_id }}'
-    mode: 0655
-
-# Put the SSH-Keys Documentation on the Desktop
-- name: Copy the SSH-Keys Documentation to the Desktop
-  copy:
-    src: ~/.slac-mac/ssh_keys.pdf
-    dest: ~/Desktop
-    owner: "{{ ansible_user_id }}"
-    mode: 0655
